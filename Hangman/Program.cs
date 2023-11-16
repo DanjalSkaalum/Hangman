@@ -6,12 +6,31 @@
         static string selectedWord;
         static char[] guessedWord;
         static int incorrectGuesses = 0;
-        const int maxIncorrectGuesses = 6;
+        const int maxIncorrectGuesses = 5;
 
-        static void Main()
+        static void Main(string[] args)
         {
+            do
+            {
+                Console.Clear();
+                Game();
+                Show("Try again? (Y/N)", 10, 10, ConsoleColor.Magenta);
+            }
+            while (Console.ReadKey().Key != ConsoleKey.N);
+            Console.Clear();
+        }
+
+
+        static void Game()
+        {
+            Show($"Welcome to the Hangman Game!".PadRight(30), 10, 4, ConsoleColor.Magenta);
+            Show($"You will have {maxIncorrectGuesses} attempts to guess the right letters.".PadRight(30), 10, 5, ConsoleColor.DarkMagenta);
+            Show($"Run out of guesses and you lose!".PadRight(30), 10, 6, ConsoleColor.DarkMagenta);
+            Show($"Press any key to continue...".PadRight(30), 10, 7, ConsoleColor.DarkMagenta);
+            Console.ReadKey();
+            Console.Clear();
+
             InitializeGame();
-            Console.WriteLine("Welcome to the Hangman Game!");
 
             do
             {
@@ -20,8 +39,8 @@
                 CheckGuess(guessedLetter);
 
             } while (!IsGameOver());
-
             DisplayResult();
+            incorrectGuesses = 0;
         }
 
         static void InitializeGame()
@@ -38,12 +57,12 @@
 
         static void DisplayWord()
         {
-            Console.WriteLine("Current word: " + new string(guessedWord));
+            Show($"Current word: " + new string(guessedWord).PadRight(30), 10, 7, ConsoleColor.White);
         }
 
         static char GetGuess()
         {
-            Console.Write("Enter a letter: ");
+            Show($"Enter a letter: ", 10, 8, ConsoleColor.Yellow);
             char guessedLetter = Console.ReadKey().KeyChar;
             Console.WriteLine(); // Move to the next line after reading the letter
             return guessedLetter;
@@ -58,13 +77,14 @@
                 {
                     guessedWord[i] = guessedLetter;
                     found = true;
+                    Show($"Correct guess!".PadRight(50), 10, 9, ConsoleColor.DarkGreen);
                 }
             }
 
             if (!found)
             {
-                Console.WriteLine("Incorrect guess!");
                 incorrectGuesses++;
+                Show($"Incorrect guess! You have {maxIncorrectGuesses - incorrectGuesses} guesses left.".PadRight(30), 10, 9, ConsoleColor.DarkRed);
             }
         }
 
@@ -87,12 +107,19 @@
         {
             if (Array.IndexOf(guessedWord, '_') == -1)
             {
-                Console.WriteLine("Congratulations! You guessed the word: " + selectedWord);
+                Show($"Congratulations! You guessed the word: " + selectedWord.PadRight(30), 10, 9, ConsoleColor.DarkGreen);
             }
             else
             {
-                Console.WriteLine("Sorry! You ran out of attempts. The correct word was: " + selectedWord);
+                Show($"Sorry! You ran out of attempts. The correct word was: " + selectedWord.PadRight(30), 10, 9, ConsoleColor.DarkRed);
             }
+        }
+
+        static void Show(object text, int x, int y, ConsoleColor color = ConsoleColor.White)
+        {
+            Console.ForegroundColor = color;
+            Console.SetCursorPosition(x, y);
+            Console.Write(text.ToString());
         }
     }
 }
